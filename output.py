@@ -1,65 +1,183 @@
-#2024-06-28 09:05:49
+#2024-07-20 10:17:06
 import requests
-import os
 import time
+import os
+from urllib.parse import urlparse,parse_qs,quote
+import re
 import random
-import hashlib
-class yuanshen():
- def __init__(self,cookie):
-  self.cookie=cookie
-  self.h={"Host":"app.zhuanbang.net","accept":"application/json, image/webp","user-agent":"Mozilla/5.0 (Linux; Android 12; M2104K10AC Build/SP1A.210812.016; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36 HuoNiuFusion/1.25.0_231652","x-requested-with":"XMLHttpRequest","sec-fetch-site":"same-origin","sec-fetch-mode":"cors","sec-fetch-dest":"empty","referer":"https://app.zhuanbang.net/assist/activity/47","accept-language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7","accept-encoding":"gzip","Cookie":f"NiuToken={self.cookie}"}
- def sign_(self):
-  d=f"{self.csrftoken}#{self.sessionId}#{self.time}"
-  byte_string=d.encode('utf-8')
-  sha1=hashlib.sha1()
-  sha1.update(byte_string)
-  sign=sha1.hexdigest()
-  return sign
- def video(self,key):
-  i=0
-  while True:
-   i+=1
-   url=f"https://app.zhuanbang.net/{key}/launch?_random={int(time.time() * 1000)}&type=slide"
-   r=requests.get(url,headers=self.h).json()
-   if r['code']==0:
-    print(f"第[{i}]个红包获取信息成功")
-    self.csrftoken=r['data']['extArgs']['csrfToken']
-    self.sessionId=r['data']['extArgs']['sessionId']
-    self.time=int(time.time())
-    url=f"https://app.zhuanbang.net/{key}/award/grant?_t={self.time}"
-    data={"csrfToken":f"{self.csrftoken}","deviceId":f"{self.sessionId}","timestamp":f"{self.time}","sign":f"{self.sign_()}"}
-    r=requests.post(url,headers=self.h,data=data).json()
-    if r['code']==0:
-     print(f"第[{i}]个红包领取成功,获得[{r['data']['awardMoney']}]元")
-    else:
-     print(f"第[{i}]个红包领取失败---[{r['msg']}]")
-     break
-   else:
-    print(f"第[{i}]个获取红包信息失败---[{r['msg']}]")
-    break
-   if i>=21:
-    break
-   time.sleep(random.randint(20,48))
- def main(self):
-  print("===========开始执行快手刷视频===========")
-  self.video("kwai_video")
-  print("===========快手刷视频执行完毕===========")
-  print("===========开始执行抖音刷视频===========")
-  self.video("pangle_video")
-  print("===========抖音刷视频执行完毕===========")
-if __name__=='__main__':
- cookie=''
- if not cookie:
-  cookie=os.getenv("yuanshen_zb")
-  if not cookie:
-   print("⛔️请设置环境变量:yuanshen_zb")
+import math
+code="可乐阅读"
+ver="1.8"
+envname="yuanshen_klyd"
+split_chars=['@','&','\n']
+debug=False
+debugcookie=""
+def env(*args,**kwargs):
+ def split_cookies(cookie,split_chars):
+  for sep in split_chars:
+   if sep in cookie:
+    return cookie.split(sep)
+  return[cookie]
+ def scmain(cookies):
+  for i,cookie in enumerate(cookies,1):
+   print(f"--------开始第{i}个账号--------")
+   main=yuanshen(cookie)
+   main.main()
+   print(f"--------第{i}个账号执行完毕--------")
+ if not os.getenv(envname)and not debug:
+  print(f"请先设置环境变量[{envname}]")
+  exit()
+ cookie=os.getenv(envname,"")
+ if debug:
+  cookie=debugcookie
+ try:
+  print(requests.get("https://gitee.com/HuaJiB/yuanshen34/raw/master/pubilc.txt").text,"\n\n\n")
+ except:
+  print("网络异常,链接公告服务器失败(gitee)，请检查网络")
+  exit()
+ cookies=split_cookies(cookie,split_chars)
+ account_count=len(cookies)
+ print(f"一共获取到{account_count}个账号")
+ print(f"=========🔔开始执行[{code}][{ver}]=========\n")
+ start_time=time.time()
+ if debug:
+  scmain(cookies)
+ else:
+  try:
+   scmain(cookies,*args,**kwargs)
+  except Exception as e:
+   print(f"脚本执行出错: {e}")
+ end_time=time.time()
+ execution_time=end_time-start_time
+ print(f"\n============🔔脚本[{code}]执行结束============")
+ print(f"本次脚本总运行时间: [{execution_time:.2f}] 秒")
+class yuanshen:
+ def __init__(self,cookie)->None:
+  self.fuck_list=[1,2,126]
+  self.biz_list=['MzkwNTY1MzYxOQ==','MzA3NzMzNjMwMQ==']
+  self.cookies={"udtauth12":cookie}
+ def tuisong(self):
+  url=f"https://wxpusher.zjiecode.com/api/send/message/?appToken={appToken}&topicId={topicIds}&content=检测文章%0A请在20秒内完成验证!%0A%3Cbody+onload%3D%22window.location.href%3D%27{quote(self.readurl)}%27%22%3E"
+  r=requests.get(url).json()
+  print(f"🎉️检测文章推送结果{r}")
+ def getmain(self):
+  headers={"Host":"230640607122241.asfuoqa.cn","Connection":"keep-alive","Upgrade-Insecure-Requests":"1","User-Agent":user_agent,"Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/wxpic,image/tpg,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7","X-Requested-With":"com.tencent.mm","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"}
+  url='http://230640607122241.asfuoqa.cn/r?upuid=2306406'
+  r=requests.get(url,headers=headers,allow_redirects=False)
+  if r.status_code==302:
+   j=urlparse(r.headers['Location'])
+   self.mainurl=j.netloc
+   print(f"获取主域名成功:[{self.mainurl}]")
+   self.headers={"Host":self.mainurl,"Connection":"keep-alive","Accept":"application/json, text/plain, */*","User-Agent":user_agent,"X-Requested-With":"XMLHttpRequest","Referer":f"http://{self.mainurl}/new?upuid=2306406","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"}
+  else:
+   print('获取主域名失败')
    exit()
- cookies=cookie.split("@")
- print(f"一共获取到{len(cookies)}个账号")
- i=1
- for cookie in cookies:
-  print(f"\n--------开始第{i}个账号--------")
-  main=yuanshen(cookie)
-  main.main()
-  print(f"--------第{i}个账号执行完毕--------")
-  i+=1
+ def getdomain(self):
+  url=f'http://{self.mainurl}/tuijian?url='
+  r=requests.get(url,headers=self.headers,cookies=self.cookies).json()
+  if r['code']==0:
+   self.today_num=int(r["data"]["infoView"]["num"])
+   try:
+    print(r["data"]["infoView"]["msg"])
+    return False
+   except:
+    pass
+  url=f'http://{self.mainurl}/new/bbbbb'
+  r=requests.get(url,headers=self.headers,cookies=self.cookies)
+  self.domain=r.json()['jump']
+  j=urlparse(self.domain)
+  p=parse_qs(self.domain.split('?')[1])
+  self.iu=p.get('iu',[None])[0]
+  self.domain_url=j.netloc
+  print(f"获取域名成功:[{self.domain_url}][{self.iu}]")
+  time.sleep(2)
+  h={"Host":self.domain_url,"Connection":"keep-alive","Upgrade-Insecure-Requests":"1","User-Agent":user_agent,"Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/wxpic,image/tpg,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7","X-Requested-With":"com.tencent.mm","Accept-Encoding":"gzip, deflate","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"}
+  r=requests.get(self.domain,headers=h,allow_redirects=False)
+  match=re.search(r"var url = '(.*)'",r.text)
+  if match:
+   self.canshu=match.group(1)
+   print("Get 阅读参数----Ok!")
+  else:
+   print("发生未知错误 获取参数失败")
+   exit()
+  print("="*30)
+  return True
+ def read(self):
+  self.readh2={"Host":"m.zzyi4cf7z8.cn","Connection":"keep-alive","sec-ch-ua":"Chromium;v=122, Not(A:Brand;v=24, Android","X-Requested-With":"XMLHttpRequest","sec-ch-ua-mobile":"?1","User-Agent":user_agent,"sec-ch-ua-platform":"Android","Accept":"*/*","Origin":f"http://{self.domain_url}","Sec-Fetch-Site":"cross-site","Sec-Fetch-Mode":"cors","Sec-Fetch-Dest":"empty","Referer":f"http://{self.domain_url}/","Accept-Encoding":"gzip, deflate, br","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"}
+  print(f"今日已读:[{self.today_num}]篇文章")
+  jkey=None
+  time.sleep(random.randint(2,5))
+  while True:
+   self.today_num+=1
+   r=random.random()
+   if jkey is None:
+    url=f"{self.canshu}?iu={self.iu}&pageshow&r={r}"
+   else:
+    url=f"{self.canshu}?iu={self.iu}&pageshow&r={r}&jkey={jkey}"
+   r=requests.get(url,headers=self.readh2).json()
+   try:
+    jkey=r["jkey"]
+    self.readurl=r['url']
+    if r['url']is None:
+     print(f"未返回有效文章url")
+     return
+   except:
+    print(f"获取文章链接失败[{r}]")
+    break
+   print(f"第[{self.today_num}]次获取文章成功:[{r['url']}]")
+   k=urlparse(self.readurl)
+   biz=parse_qs(k.query).get('__biz',[''])[0]if '__biz' in parse_qs(k.query)else ''
+   if biz in self.biz_list or self.today_num in self.fuck_list:
+    print('遇到检测文章，推送ing....')
+    self.tuisong()
+    time.sleep(random.randint(20,26))
+   else:
+    time.sleep(random.randint(8,18))
+   if self.today_num>=Quantity_limit:
+    print(f"今日已读数量已达设置上限")
+    break
+ def userinfo(self):
+  url=f'http://{self.mainurl}/tuijian?url='
+  r=requests.get(url,headers=self.headers,cookies=self.cookies).json()
+  if r['code']==0:
+   gold=float(r['data']['user']['score'])*100
+   print(f'今日已赚金币:[{float(r["data"]["infoView"]["score"])*100}]\n当前账号剩余金币:[{gold}] = [{gold/10000}]元')
+   if gold>=withdrawal_money:
+    self.withdrawal()
+   else:
+    print(f"金币余额不足[{withdrawal_money}] 不提现")
+  else:
+   print(f"查询个人余额失败:[{r}]")
+ def withdrawal(self):
+  url=f'http://{self.mainurl}/withdrawal'
+  r=requests.get(url,headers=self.headers,cookies=self.cookies).json()
+  if r['code']==0:
+   score=math.floor(float(r['data']['user']['score']))
+   data={'amount':score,'type':'wx'}
+   url=f'http://{self.mainurl}/withdrawal/doWithdraw'
+   r=requests.post(url,data=data,headers=self.headers,cookies=self.cookies)
+   print(f"提现结果:[{r.text}]")
+ def main(self):
+  self.getmain()
+  time.sleep(random.randint(2,5))
+  if self.getdomain():
+   self.read()
+  print("="*40)
+  self.userinfo()
+if __name__=='__main__':
+ appToken=''
+ topicIds=''
+ if debug:
+  appToken=''
+  topicIds=''
+ if not appToken or not topicIds:
+  appToken=os.getenv('yuanshen_apptoken')
+  topicIds=os.getenv('yuanshen_topicid')
+  if not appToken or not topicIds:
+   print("❌你还没有设置推送,请设置环境变量:yuanshen_topicid和yuanshen_apptoken")
+   exit()
+ user_agent=os.getenv('yuanshen_useragent')
+ if not user_agent:
+  print("❌你还没有设置user_agent,请设置环境变量:yuanshen_useragent")
+  exit()
+ env()
