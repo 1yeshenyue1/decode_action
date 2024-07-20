@@ -1,4 +1,4 @@
-#2024-07-20 10:17:06
+#2024-07-20 16:15:02
 import requests
 import time
 import os
@@ -7,7 +7,7 @@ import re
 import random
 import math
 code="可乐阅读"
-ver="1.8"
+ver="1.9"
 envname="yuanshen_klyd"
 split_chars=['@','&','\n']
 debug=False
@@ -53,7 +53,7 @@ def env(*args,**kwargs):
  print(f"本次脚本总运行时间: [{execution_time:.2f}] 秒")
 class yuanshen:
  def __init__(self,cookie)->None:
-  self.fuck_list=[1,2,126]
+  self.fuck_list=fuck_list
   self.biz_list=['MzkwNTY1MzYxOQ==','MzA3NzMzNjMwMQ==']
   self.cookies={"udtauth12":cookie}
  def tuisong(self):
@@ -105,6 +105,9 @@ class yuanshen:
  def read(self):
   self.readh2={"Host":"m.zzyi4cf7z8.cn","Connection":"keep-alive","sec-ch-ua":"Chromium;v=122, Not(A:Brand;v=24, Android","X-Requested-With":"XMLHttpRequest","sec-ch-ua-mobile":"?1","User-Agent":user_agent,"sec-ch-ua-platform":"Android","Accept":"*/*","Origin":f"http://{self.domain_url}","Sec-Fetch-Site":"cross-site","Sec-Fetch-Mode":"cors","Sec-Fetch-Dest":"empty","Referer":f"http://{self.domain_url}/","Accept-Encoding":"gzip, deflate, br","Accept-Language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"}
   print(f"今日已读:[{self.today_num}]篇文章")
+  if self.today_num>=Quantity_limit:
+   print(f"今日已读数量已达设置上限")
+   return
   jkey=None
   time.sleep(random.randint(2,5))
   while True:
@@ -133,9 +136,6 @@ class yuanshen:
     time.sleep(random.randint(20,26))
    else:
     time.sleep(random.randint(8,18))
-   if self.today_num>=Quantity_limit:
-    print(f"今日已读数量已达设置上限")
-    break
  def userinfo(self):
   url=f'http://{self.mainurl}/tuijian?url='
   r=requests.get(url,headers=self.headers,cookies=self.cookies).json()
